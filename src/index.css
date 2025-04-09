@@ -89,7 +89,7 @@ body {
 .chat-body .message {
   display: flex;
   gap: 11px;
-  align-items: center;
+  align-items: flex-end;
 }
 
 .chat-body .bot-message svg {
@@ -129,7 +129,7 @@ body {
 
 .chat-footer {
   position: absolute;
-  bottom: 0;
+  bottom: -70px;
   width: 100%;
   background: #fff;
   padding: 15px 22px 20px;
