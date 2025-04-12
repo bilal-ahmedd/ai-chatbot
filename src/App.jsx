@@ -2,16 +2,25 @@ import { useState, useRef, useEffect } from "react"
 import ChatbotIcon from "./components/ChatbotIcon"
 import ChatForm from "./components/ChatForm"
 import ChatMessage from "./components/ChatMessage"
+import { CompanyInfo } from "./companyInfo"
 
 const App = () => {
 
-  const [chatHistory, setChatHistory ] = useState([]);
+  const [chatHistory, setChatHistory ] = useState([
+    {
+      hideInChat: true,
+      role: "model",
+      text: CompanyInfo
+    }
+
+  ]);
+  const [showChatbot, setShowChatbot ] = useState(false);
   const chatBodyRef = useRef();
 
   const generateBotResponse = async ( history ) => {
 
-    const updateHistory = (text) => {
-      setChatHistory( (prev) => [...prev.filter((msg) => msg.text !==  "Thinking..."), {role: "model", text}] )
+    const updateHistory = (text, isError) => {
+      setChatHistory( (prev) => [...prev.filter((msg) => msg.text !==  "Thinking..."), {role: "model", text, isError}] )
     }
 
     history = history.map( ({role, text }) => ({role, parts: [{text}]}) );
@@ -31,7 +40,7 @@ const App = () => {
       const apiResponse = data.candidates[0].content.parts[0].text.replace(/\*\*(.*?)\*\*/g, "$1").trim();
       updateHistory(apiResponse);
     } catch( error ) {
-      console.log(error);
+      updateHistory(error.message, true);
     }
   }
 
@@ -40,8 +49,8 @@ const App = () => {
   }, [chatHistory])
 
   return (
-    <div className='container'>
-      <button id="chatbot-toggler">
+    <div className={`container ${showChatbot ? "show-chatbot" : ""}`}>
+      <button onClick={() => setShowChatbot( (prev) => !prev )} id="chatbot-toggler">
         <span className="material-symbols-rounded"> mode_comment</span>
         <span className="material-symbols-rounded"> close</span>
       </button>
@@ -52,7 +61,7 @@ const App = () => {
             <ChatbotIcon/>
             <h2 className="logo-text"> ChatBot </h2>
           </div>
-          <button className="material-symbols-rounded"> keyboard_arrow_down </button>
+          <button onClick={() => setShowChatbot( (prev) => !prev )} className="material-symbols-rounded"> keyboard_arrow_down </button>
         </div>
 
         {/* Chatbot Body */}
